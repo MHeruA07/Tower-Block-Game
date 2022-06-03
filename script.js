@@ -169,7 +169,6 @@ class Game {
             'PLAYING': 'playing',
             'READY': 'ready',
             'ENDED': 'ended',
-            'RESETTING': 'resetting'
         };
         this.blocks = [];
         this.state = this.STATES.LOADING;
@@ -216,9 +215,6 @@ class Game {
             case this.STATES.PLAYING:
                 this.placeBlock();
                 break;
-            case this.STATES.ENDED:
-                this.restartGame();
-                break;
         }
     }
     startGame() {
@@ -227,24 +223,6 @@ class Game {
             this.updateState(this.STATES.PLAYING);
             this.addBlock();
         }
-    }
-    restartGame() {
-        this.updateState(this.STATES.RESETTING);
-        let oldBlocks = this.placedBlocks.children;
-        let removeSpeed = 0.2;
-        let delayAmount = 0.02;
-        for (let i = 0; i < oldBlocks.length; i++) {
-            TweenLite.to(oldBlocks[i].scale, removeSpeed, { x: 0, y: 0, z: 0, delay: (oldBlocks.length - i) * delayAmount, ease: Power1.easeIn, onComplete: () => this.placedBlocks.remove(oldBlocks[i]) });
-            TweenLite.to(oldBlocks[i].rotation, removeSpeed, { y: 0.5, delay: (oldBlocks.length - i) * delayAmount, ease: Power1.easeIn });
-        }
-        let cameraMoveSpeed = removeSpeed * 2 + (oldBlocks.length * delayAmount);
-        this.stage.setCamera(2, cameraMoveSpeed);
-        let countdown = { value: this.blocks.length - 1 };
-        TweenLite.to(countdown, cameraMoveSpeed, { value: 0, onUpdate: () => { this.scoreContainer.innerHTML = String(Math.round(countdown.value)); } });
-        this.blocks = this.blocks.slice(0, 1);
-        setTimeout(() => {
-            this.startGame();
-        }, cameraMoveSpeed * 1000);
     }
     placeBlock() {
         let currentBlock = this.blocks[this.blocks.length - 1];
